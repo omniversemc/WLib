@@ -6,26 +6,18 @@ dependencies {
     compileOnly(
             'org.projectlombok:lombok:1.18.24',
             'org.jetbrains:annotations:23.0.0',
-            'org.spigotmc:spigot:1.17.1-R0.1-SNAPSHOT',
+            'org.spigotmc:spigot:1.8.8-R0.1-SNAPSHOT',
     )
     annotationProcessor('org.projectlombok:lombok:1.18.24')
 
     implementation(
-            project(':utils'),
             project(':versions:adapter'),
 
-            project(':versions:v1_17_R1'),
-            project(':versions:v1_18_R1'),
-            project(':versions:v1_18_R2'),
-            project(':versions:v1_19_R1'),
-
             project(':database'),
-
             project(':objects'),
-
             project(':commands'),
-
-            project(':config')
+            project(':config'),
+            project(':utils'),
     )
 }
 

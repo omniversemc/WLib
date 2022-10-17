@@ -22,14 +22,14 @@ public class ObjectUtil {
      */
     @SuppressWarnings("unchecked")
     public static <T> T clone(T original) {
-        if (original instanceof Map<?,?> map)
-            return (T) MapUtils.deepClone(HashMap::new, map);
+        if (original instanceof Map<?,?>)
+            return (T) MapUtils.deepClone(HashMap::new, (Map<?, ?>) original);
 
-        if (original instanceof List<?> list)
-            return (T) CollectionUtil.deepClone(ArrayList::new, list);
+        if (original instanceof List<?>)
+            return (T) CollectionUtil.deepClone(ArrayList::new, (List<?>) original);
 
-        if (original instanceof Set<?> set)
-            return (T) CollectionUtil.deepClone(HashSet::new, set);
+        if (original instanceof Set<?>)
+            return (T) CollectionUtil.deepClone(HashSet::new, (Set<?>) original);
 
         if (!(original instanceof Cloneable))
             return original;

@@ -24,10 +24,10 @@ public class CustomInventoryHolder implements InventoryHolder {
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof CustomInventoryHolder other))
+        if (!(obj instanceof CustomInventoryHolder))
             return false;
 
-        return other.getHolder().getId() == holder.getId();
+        return ((CustomInventoryHolder) obj).getHolder().getId() == holder.getId();
     }
 
     @Override

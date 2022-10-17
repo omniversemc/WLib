@@ -1,9 +1,7 @@
 package com.wizardlybump17.wlib.config;
 
-import com.wizardlybump17.wlib.item.ItemBuilder;
 import com.wizardlybump17.wlib.util.ArrayUtils;
 import com.wizardlybump17.wlib.util.CollectionUtil;
-import com.wizardlybump17.wlib.util.bukkit.NumberFormatter;
 import com.wizardlybump17.wlib.util.bukkit.StringUtil;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -18,8 +16,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.*;
 
 @EqualsAndHashCode(callSuper = false)
@@ -62,17 +58,6 @@ public class Config extends YamlConfiguration implements Configuration<YamlConfi
 
     public World getWorld(String path) {
         return getWorld(path, null);
-    }
-
-    public NumberFormatter getNumberFormatter(String path, NumberFormatter def) {
-        List<String> list = getStringList(path);
-        if (list.isEmpty())
-            return def;
-        return new NumberFormatter(list);
-    }
-
-    public NumberFormatter getNumberFormatter(String path) {
-        return getNumberFormatter(path, null);
     }
 
     public Number getNumber(String path, Number def) {
@@ -137,18 +122,17 @@ public class Config extends YamlConfiguration implements Configuration<YamlConfi
 
     public Map<String, Object> getMap(String path, Map<String, Object> def) {
         Object object = get(path);
-        if (object instanceof ConfigurationSerializable serializable)
-            return serializable.serialize();
-        if (!(object instanceof ConfigurationSection section))
-            return def;
-        return convertToMap(section);
+        if (object instanceof ConfigurationSerializable)
+            return ((ConfigurationSerializable) object).serialize();
+        if (object instanceof ConfigurationSection)
+            return convertToMap((ConfigurationSection) object);
+        return def;
     }
 
     public Map<String, Object> getMap(String path) {
         return getMap(path, null);
     }
 
-    @SuppressWarnings("unchecked")
     public <T extends Enum<T>> Map<T, Object> getEnumMap(String path, Class<T> classType, Map<T, Object> def) {
         Object defObject = get(path, def);
         if (!(defObject instanceof ConfigurationSection))
@@ -157,18 +141,9 @@ public class Config extends YamlConfiguration implements Configuration<YamlConfi
         EnumMap<T, Object> map = new EnumMap<>(classType);
         Map<String, Object> originalMap = convertToMap(((ConfigurationSection) defObject));
 
-        Method method;
-        try {
-            method = classType.getDeclaredMethod("valueOf", String.class);
-        } catch (NoSuchMethodException ignored) {
-            return def; //???????????????? ^^^^^
-        }
-
         originalMap.forEach((key, value) -> {
             try {
-                map.put((T) method.invoke(null, key.toUpperCase()), value);
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
+                map.put(Enum.valueOf(classType, key.toUpperCase()), value);
             } catch (IllegalArgumentException ignored) { //we don't want a console log for this
             }
         });
@@ -210,15 +185,6 @@ public class Config extends YamlConfiguration implements Configuration<YamlConfi
         return getFancyString(path, null);
     }
 
-    public ItemBuilder getItemBuilder(String path, ItemBuilder def) {
-        Object object = get(path);
-        if (object instanceof ConfigurationSection section)
-            return ItemBuilder.deserialize(convertToMap(section));
-        if (object instanceof ItemBuilder builder)
-            return builder;
-        return def;
-    }
-
     @SuppressWarnings("unchecked")
     @Override
     public Object get(String path, Object def, Class<?> type, Path requester) {
@@ -227,10 +193,10 @@ public class Config extends YamlConfiguration implements Configuration<YamlConfi
             o = def;
 
         if (ArrayUtils.contains(requester.options(), "fancy")) {
-            if (o instanceof String string)
-                return StringUtil.colorize(string.replace("\\n", "\n"));
-            if (o instanceof List<?> list)
-                return new CollectionUtil<>(StringUtil.colorize((List<String>) list)).replace("\\n", "\n").getCollection();
+            if (o instanceof String)
+                return StringUtil.colorize(o.toString().replace("\\n", "\n"));
+            if (o instanceof List<?>)
+                return new CollectionUtil<>(StringUtil.colorize((List<String>) o)).replace("\\n", "\n").getCollection();
         }
 
         if (o instanceof Number)
@@ -261,10 +227,6 @@ public class Config extends YamlConfiguration implements Configuration<YamlConfi
     @Override
     public Object get(String path, Class<?> type, Path requester) {
         return get(path, null, type, requester);
-    }
-
-    public ItemBuilder getItemBuilder(String path) {
-        return getItemBuilder(path, null);
     }
 
     @Override
@@ -342,8 +304,8 @@ public class Config extends YamlConfiguration implements Configuration<YamlConfi
         Map<String, Object> map = new LinkedHashMap<>();
         for (String key : section.getKeys(false)) {
             Object object = section.get(key);
-            if (object instanceof ConfigurationSection childSection)
-                object = convertToMap(childSection);
+            if (object instanceof ConfigurationSection)
+                object = convertToMap((ConfigurationSection) object);
             if (object instanceof List) {
                 try {
                     final List<ConfigurationSection> list = (List<ConfigurationSection>) object;

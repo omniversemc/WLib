@@ -5,9 +5,9 @@ import com.wizardlybump17.wlib.command.sender.GenericSender;
 import com.wizardlybump17.wlib.command.sender.PlayerSender;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import org.bukkit.command.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 
 @RequiredArgsConstructor

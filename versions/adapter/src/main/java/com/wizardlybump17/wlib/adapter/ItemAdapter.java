@@ -1,17 +1,15 @@
 package com.wizardlybump17.wlib.adapter;
 
-import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
+import lombok.NonNull;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
-import org.bukkit.persistence.PersistentDataAdapterContext;
-import org.bukkit.persistence.PersistentDataContainer;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Base64;
 import java.util.Map;
 
 public abstract class ItemAdapter {
 
-    public static final PersistentDataAdapterContext PERSISTENT_DATA_ADAPTER_CONTEXT = new ItemStack(Material.BOW).getItemMeta().getPersistentDataContainer().getAdapterContext();
     private static ItemAdapter instance;
 
     public static ItemAdapter getInstance() {
@@ -23,15 +21,20 @@ public abstract class ItemAdapter {
             ItemAdapter.instance = instance;
     }
 
-    public abstract Map<String, Object> serializeContainer(PersistentDataContainer container);
+    public abstract void setSkull(@NonNull SkullMeta meta, @NonNull String url);
 
-    public abstract PersistentDataContainer deserializeContainer(Map<String, Object> map);
+    public abstract String getSkullUrl(@NonNull SkullMeta meta);
 
-    public abstract void transferPersistentData(PersistentDataContainer from, PersistentDataContainer to);
+    public abstract void setNbtTags(@NonNull ItemMeta meta, @NonNull Map<String, Object> nbtTags);
 
-    public abstract void setSkull(SkullMeta meta, String url);
+    public abstract void setNbtTag(@NonNull ItemMeta meta, @NonNull String key, @NonNull Object value);
 
-    public abstract String getSkullUrl(SkullMeta meta);
+    @NotNull
+    public abstract Map<String, Object> getNbtTags(@NonNull ItemMeta meta);
+
+    public abstract Object nbtToJava(Object original);
+
+    public abstract Object javaToNbt(Object original);
 
     public static String getSkullTextureBase64(String url) {
         return new String(Base64.getEncoder().encode(("{textures:{SKIN:{url:\"" + url + "\"}}}").getBytes()));

@@ -159,17 +159,30 @@ public class PaginatedInventoryBuilder implements ConfigurationSerializable, Clo
             int slot = 0;
             for (char c : shapeChars) {
                 switch (c) {
-                    case 'x' -> {
+                    case 'x': {
                         if (content.isEmpty() || currentItem >= content.size()) {
                             slot++;
                             continue;
                         }
 
                         inventory.addButton(slot++, content.get(currentItem++));
+                        break;
                     }
-                    case '>' -> setNavigator(slot++, inventory, true, page, pages);
-                    case '<' -> setNavigator(slot++, inventory, false, page, pages);
-                    default -> inventory.addButton(slot++, shapeReplacements.get(c));
+
+                    case '>': {
+                        setNavigator(slot++, inventory, true, page, pages);
+                        break;
+                    }
+
+                    case '<': {
+                        setNavigator(slot++, inventory, false, page, pages);
+                        break;
+                    }
+
+                    default: {
+                        inventory.addButton(slot++, shapeReplacements.get(c));
+                        break;
+                    }
                 }
             }
         }

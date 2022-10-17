@@ -20,11 +20,12 @@ public class SQLiteDatabaseModel extends DatabaseModel<SQLiteDatabase> {
 
     @Override
     public String getModifierCommand(Modifier modifier) {
-        return switch (modifier) {
-            case UNIQUE -> "UNIQUE";
-            case PRIMARY_KEY -> "PRIMARY KEY";
-            case NOT_NULL -> "NOT NULL";
-            case AUTO_INCREMENT -> "AUTOINCREMENT";
-        };
+        switch (modifier) {
+            case UNIQUE: return "UNIQUE";
+            case PRIMARY_KEY: return "PRIMARY KEY";
+            case NOT_NULL: return "NOT NULL";
+            case AUTO_INCREMENT: return "AUTOINCREMENT";
+            default: return "";
+        }
     }
 }

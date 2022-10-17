@@ -131,10 +131,10 @@ public class PaginatedInventory {
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof PaginatedInventory other))
+        if (!(obj instanceof PaginatedInventory))
             return false;
 
-        return other.id == id;
+        return ((PaginatedInventory) obj).id == id;
     }
 
     @Override

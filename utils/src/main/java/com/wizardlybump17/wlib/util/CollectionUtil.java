@@ -2,10 +2,7 @@ package com.wizardlybump17.wlib.util;
 
 import lombok.RequiredArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -164,6 +161,7 @@ public class CollectionUtil<E> {
      * @param <E> the element type
      * @param <T> the collection type
      */
+    @SafeVarargs
     public static <E, T extends Collection<E>> T listOf(Supplier<T> supplier, E... elements) {
         T collection = supplier.get();
         collection.addAll(Arrays.asList(elements));
@@ -196,5 +194,12 @@ public class CollectionUtil<E> {
         for (E e : original)
             clone.add(ObjectUtil.clone(e));
         return clone;
+    }
+
+    @SafeVarargs
+    public static <E> Set<E> setOf(E... elements) {
+        Set<E> set = new HashSet<>(elements.length);
+        set.addAll(Arrays.asList(elements));
+        return set;
     }
 }

@@ -1,26 +1,15 @@
 rootProject.name = 'WLib'
 
 include 'core'
-
-include 'versions:adapter'
-findProject(':versions:adapter')?.name = 'adapter'
-
-include 'versions:v1_17_R1'
-findProject(':versions:v1_17_R1')?.name = 'v1_17_R1'
-
-include 'versions:v1_18_R1'
-findProject(':versions:v1_18_R1')?.name = 'v1_18_R1'
-
-include 'versions:v1_18_R2'
-findProject(':versions:v1_18_R2')?.name = 'v1_18_R2'
-
-include 'versions:v1_19_R1'
-findProject(':versions:v1_19_R1')?.name = 'v1_19_R1'
-
 include 'utils'
 include 'database'
 include 'objects'
 include 'commands'
 include 'config'
 include 'bungee'
+
+include 'versions:adapter'
+findProject(':versions:adapter')?.name = 'adapter'
+include 'versions:v1_8_R3'
+findProject(':versions:v1_8_R3')?.name = 'v1_8_R3'
 

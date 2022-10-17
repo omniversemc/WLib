@@ -60,43 +60,52 @@ public class ItemFilter implements ConfigurationSerializable {
             for (Map.Entry<FilterType, Object> entry : filtersMap.entrySet()) {
                 Object object = entry.getValue();
                 switch (entry.getKey()) {
-                    case MATERIAL -> {
+                    case MATERIAL: {
                         if (!testMaterial(object.toString(), builder))
                             return false;
+                        break;
                     }
-                    case AMOUNT -> {
+                    case AMOUNT: {
                         if (!testAmount(object.toString(), builder))
                             return false;
+                        break;
                     }
-                    case DAMAGE -> {
+                    case DAMAGE: {
                         if (!testDamage(object.toString(), builder))
                             return false;
+                        break;
                     }
-                    case DISPLAY_NAME -> {
+                    case DISPLAY_NAME: {
                         if (!testDisplayName(object.toString(), builder))
                             return false;
+                        break;
                     }
-                    case LORE -> {
+                    case LORE: {
                         if (!testLore((List<String>) object, builder))
                             return false;
+                        break;
                     }
-                    case ENCHANTMENTS -> {
+                    case ENCHANTMENTS: {
                         if (!testEnchantments((Map<String, String>) object, builder))
                             return false;
+                        break;
                     }
-                    case ITEM_FLAGS -> {
+                    case ITEM_FLAGS: {
                         if (!testItemFlags((List<String>) object, builder))
                             return false;
+                        break;
                     }
-                    case GLOW -> {
+                    case GLOW: {
                         if (!testGlow((boolean) object, builder))
                             return false;
+                        break;
                     }
-                    case UNBREAKABLE -> {
+                    case UNBREAKABLE: {
                         if (!testUnbreakable((boolean) object, builder))
                             return false;
+                        break;
                     }
-                    case NBT_TAGS -> {
+                    case NBT_TAGS: {
                         if (!testNbtTags((Map<String, String>) object, builder))
                             return false;
                     }
@@ -144,7 +153,7 @@ public class ItemFilter implements ConfigurationSerializable {
         if (enchantments != null && !builder.enchantments().isEmpty()) {
             for (Map.Entry<String, String> baseEntry : enchantments.entrySet())
                 for (Map.Entry<Enchantment, Integer> enchantmentEntry : builder.enchantments().entrySet())
-                    if (!testString(baseEntry.getKey(), enchantmentEntry.getKey().getKey().toString()) || !testInt(baseEntry.getValue(), enchantmentEntry.getValue()))
+                    if (!testString(baseEntry.getKey(), enchantmentEntry.getKey().getName()) || !testInt(baseEntry.getValue(), enchantmentEntry.getValue()))
                         return false;
 
             return true;

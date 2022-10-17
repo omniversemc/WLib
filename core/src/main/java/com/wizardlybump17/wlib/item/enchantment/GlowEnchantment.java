@@ -1,7 +1,5 @@
 package com.wizardlybump17.wlib.item.enchantment;
 
-import com.wizardlybump17.wlib.WLib;
-import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.inventory.ItemStack;
@@ -14,7 +12,7 @@ public class GlowEnchantment extends Enchantment {
     public static final GlowEnchantment INSTANCE = new GlowEnchantment();
 
     public GlowEnchantment() {
-        super(new NamespacedKey(WLib.getInstance(), "glow"));
+        super(5000);
     }
 
     @NotNull
@@ -40,16 +38,6 @@ public class GlowEnchantment extends Enchantment {
     }
 
     @Override
-    public boolean isTreasure() {
-        return false;
-    }
-
-    @Override
-    public boolean isCursed() {
-        return false;
-    }
-
-    @Override
     public boolean conflictsWith(@NotNull Enchantment enchantment) {
         return false;
     }
@@ -60,7 +48,7 @@ public class GlowEnchantment extends Enchantment {
     }
 
     public static void register() {
-        if (Enchantment.getByKey(INSTANCE.getKey()) != null)
+        if (Enchantment.getByName(INSTANCE.getName()) != null)
             return;
 
         try {

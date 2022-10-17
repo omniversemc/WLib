@@ -8,19 +8,14 @@ import com.wizardlybump17.wlib.util.bukkit.StringUtil;
 import lombok.NonNull;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.SerializableAs;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
-import org.bukkit.persistence.PersistentDataContainer;
-import org.bukkit.persistence.PersistentDataHolder;
-import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -89,18 +84,12 @@ public class ItemBuilder implements ConfigurationSerializable, Cloneable {
     }
 
     public ItemBuilder damage(int durability) {
-        return consumeMeta(meta -> {
-            if (meta instanceof Damageable damageable)
-                damageable.setDamage(durability);
-        });
+        item.setDurability((short) durability);
+        return this;
     }
 
     public int damage() {
-        return getFromMeta(meta -> {
-            if (meta instanceof Damageable damageable)
-                return damageable.getDamage();
-            return null;
-        }, 0);
+        return item.getDurability();
     }
 
     public ItemBuilder lore(@Nullable String... lore) {
@@ -123,33 +112,6 @@ public class ItemBuilder implements ConfigurationSerializable, Cloneable {
             meta.removeItemFlags(meta.getItemFlags().toArray(EMPTY_ITEM_FLAG_ARRAY));
             meta.addItemFlags(itemFlags.toArray(EMPTY_ITEM_FLAG_ARRAY));
         });
-    }
-
-    public <Z> ItemBuilder nbtTag(@NonNull String key, @NonNull PersistentDataType<?, Z> type, @NonNull Z value) {
-        return nbtTag(NamespacedKey.fromString(key), type, value);
-    }
-
-    public <Z> ItemBuilder nbtTag(@NonNull NamespacedKey key, @NonNull PersistentDataType<?, Z> type, @NonNull Z value) {
-        return consumeMeta(meta -> meta.getPersistentDataContainer().set(key, type, value));
-    }
-
-    public ItemBuilder removeNbtTag(@NonNull String key) {
-        return removeNbtTag(NamespacedKey.fromString(key));
-    }
-
-    public ItemBuilder removeNbtTag(@NonNull NamespacedKey key) {
-        return consumeMeta(meta -> meta.getPersistentDataContainer().remove(key));
-    }
-
-    public ItemBuilder nbtTags(@NonNull PersistentDataContainer container) {
-        return consumeMeta(meta -> {
-            PersistentDataContainer targetContainer = meta.getPersistentDataContainer();
-            ItemAdapter.getInstance().transferPersistentData(container, targetContainer);
-        });
-    }
-
-    public Map<String, Object> nbtTags() {
-        return ItemAdapter.getInstance().serializeContainer(container());
     }
 
     public ItemBuilder enchantment(Enchantment enchantment, int level) {
@@ -196,10 +158,6 @@ public class ItemBuilder implements ConfigurationSerializable, Cloneable {
         return getFromMeta(ItemMeta::getItemFlags, new HashSet<>());
     }
 
-    public PersistentDataContainer container() {
-        return getFromMeta(PersistentDataHolder::getPersistentDataContainer, ItemAdapter.PERSISTENT_DATA_ADAPTER_CONTEXT.newPersistentDataContainer());
-    }
-
     public ItemBuilder replaceDisplayNameLore(Map<String, Object> replacements) {
         String displayName = displayName();
         List<String> lore = lore();
@@ -213,48 +171,38 @@ public class ItemBuilder implements ConfigurationSerializable, Cloneable {
     }
 
     public ItemBuilder unbreakable(boolean unbreakable) {
-        return consumeMeta(meta -> meta.setUnbreakable(unbreakable));
+        return consumeMeta(meta -> meta.spigot().setUnbreakable(unbreakable));
     }
 
     public boolean unbreakable() {
-        return getFromMeta(ItemMeta::isUnbreakable, false);
-    }
-
-    public ItemBuilder customModelData(Integer customModelData) {
-        return consumeMeta(meta -> meta.setCustomModelData(customModelData));
-    }
-
-    public Integer customModelData() {
-        return getFromMeta(meta -> {
-            if (meta.hasCustomModelData())
-                return meta.getCustomModelData();
-            return null;
-        }, null);
+        return getFromMeta(meta -> meta.spigot().isUnbreakable(), false);
     }
 
     public String skullUrl() {
-        if (getItemMeta() instanceof SkullMeta meta)
-            return ItemAdapter.getInstance().getSkullUrl(meta);
+        if (getItemMeta() instanceof SkullMeta)
+            return ItemAdapter.getInstance().getSkullUrl((SkullMeta) getItemMeta());
         return null;
     }
 
     public ItemBuilder skull(String url) {
         return consumeMeta(meta -> {
-            if (meta instanceof SkullMeta skull)
-                ItemAdapter.getInstance().setSkull(skull, url);
+            if (meta instanceof SkullMeta)
+                ItemAdapter.getInstance().setSkull((SkullMeta) meta, url);
         });
     }
 
-    public OfflinePlayer skullOwner() {
-        if (getItemMeta() instanceof SkullMeta meta)
-            return meta.getOwningPlayer();
-        return null;
+    public String skullOwner() {
+        return getFromMeta(meta -> {
+            if (meta instanceof SkullMeta)
+                return ((SkullMeta) meta).getOwner();
+            return null;
+        }, null);
     }
 
     public ItemBuilder skull(OfflinePlayer owner) {
         return consumeMeta(meta -> {
-            if (meta instanceof SkullMeta skull)
-                skull.setOwningPlayer(owner);
+            if (meta instanceof SkullMeta)
+                ((SkullMeta) meta).setOwner(owner.getName());
         });
     }
 
@@ -273,7 +221,42 @@ public class ItemBuilder implements ConfigurationSerializable, Cloneable {
         return this.customData;
     }
 
+    public ItemBuilder applyColor(boolean applyColor) {
+        if (applyColor)
+            customData.put("apply-color", true);
+        else
+            customData.remove("apply-color");
+        return this;
+    }
+
+    public boolean applyColor() {
+        return (boolean) customData.getOrDefault("apply-color", true);
+    }
+
+    public ItemBuilder nbtTag(@NonNull String key, @NonNull Object value) {
+        return consumeMeta(meta -> ItemAdapter.getInstance().setNbtTag(meta, key, value));
+    }
+
+    public ItemBuilder nbtTags(@NonNull Map<String, Object> nbtTags) {
+        return consumeMeta(meta -> ItemAdapter.getInstance().setNbtTags(meta, nbtTags));
+    }
+
+    @Nullable
+    public Object nbtTag(@NonNull String key) {
+        return nbtTags().get(key);
+    }
+
+    @NotNull
+    public Map<String, Object> nbtTags() {
+        return ItemAdapter.getInstance().getNbtTags(getItemMeta());
+    }
+
     public ItemStack build() {
+        if (applyColor()) {
+            displayName(StringUtil.colorize(displayName()));
+            lore(StringUtil.colorize(new ArrayList<>(lore()))); //creating a new ArrayList to avoid immutable list
+        }
+
         return item;
     }
 
@@ -292,19 +275,17 @@ public class ItemBuilder implements ConfigurationSerializable, Cloneable {
         if (!lore().isEmpty())
             result.put("lore", lore());
         if (!itemFlags().isEmpty())
-            result.put("item-flags", itemFlags().stream().map(Enum::name).toList());
+            result.put("item-flags", itemFlags().stream().map(Enum::name).collect(Collectors.toCollection(ArrayList::new)));
         if (!enchantments().isEmpty())
-            result.put("enchantments", MapUtils.mapKeys(enchantments(), enchantment -> enchantment.getKey().toString()));
-        if (!container().isEmpty())
-            result.put("nbt-tags", ItemAdapter.getInstance().serializeContainer(container()));
+            result.put("enchantments", MapUtils.mapKeys(enchantments(), Enchantment::getName));
+//        if (!nbtTags().isEmpty())
+//            result.put("nbt-tags", ItemAdapter.getInstance().serializeContainer(container()));
         if (unbreakable())
             result.put("unbreakable", true);
-        if (customModelData() != null)
-            result.put("custom-model-data", customModelData());
         if (skullUrl() != null)
             result.put("skull", skullUrl());
         if (skullOwner() != null)
-            result.put("skull", skullOwner().getUniqueId().toString());
+            result.put("skull", skullOwner());
         if (!customData().isEmpty())
             result.put("custom-data", customData());
 
@@ -331,7 +312,11 @@ public class ItemBuilder implements ConfigurationSerializable, Cloneable {
     public static ItemBuilder deserialize(Map<String, Object> map) {
         ItemBuilder result = new ItemBuilder();
 
+        if (map.get("nbt-tags") != null)
+            result.nbtTags((Map<String, Object>) map.get("nbt-tags"));
+
         result
+                .customData((Map<Object, Object>) map.getOrDefault("custom-data", Collections.emptyMap()))
                 .type(Material.valueOf((String) map.get("type")))
                 .amount((int) map.getOrDefault("amount", 1));
 
@@ -344,9 +329,7 @@ public class ItemBuilder implements ConfigurationSerializable, Cloneable {
         if (map.get("item-flags") != null)
             result.itemFlags(((List<String>) map.get("item-flags")).stream().map(ItemFlag::valueOf).collect(Collectors.toSet()));
         if (map.get("enchantments") != null)
-            ((Map<String, Integer>) map.get("enchantments")).forEach((key, value) -> result.enchantment(Enchantment.getByKey(NamespacedKey.fromString(key.toLowerCase())), value));
-        if (map.get("nbt-tags") != null)
-            result.nbtTags(ItemAdapter.getInstance().deserializeContainer((Map<String, Object>) map.get("nbt-tags")));
+            ((Map<String, Number>) map.get("enchantments")).forEach((key, value) -> result.enchantment(Enchantment.getByName(key), value.intValue()));
 
         if (map.get("skull") != null) {
             String skull = map.get("skull").toString();
@@ -357,10 +340,13 @@ public class ItemBuilder implements ConfigurationSerializable, Cloneable {
             }
         }
 
-        result
-                .unbreakable((boolean) map.getOrDefault("unbreakable", false))
-                .customModelData((Integer) map.get("custom-model-data"))
-                .customData((Map<Object, Object>) map.getOrDefault("custom-data", Collections.emptyMap()));
+        result.unbreakable((boolean) map.getOrDefault("unbreakable", false));
+
+        if (result.applyColor()) {
+            result
+                    .displayName(StringUtil.colorize(result.displayName()))
+                    .lore(StringUtil.colorize(result.lore()));
+        }
 
         return result;
     }

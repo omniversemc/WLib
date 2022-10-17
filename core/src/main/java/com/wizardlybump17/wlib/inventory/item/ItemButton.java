@@ -23,7 +23,8 @@ public class ItemButton implements ConfigurationSerializable, Cloneable {
 
     public static final ItemButton BLACK_STAINED_GLASS_PANE = new ItemButton(
             new ItemBuilder()
-                    .type(Material.BLACK_STAINED_GLASS_PANE)
+                    .type(Material.STAINED_GLASS_PANE)
+                    .damage(15)
                     .displayName(" ")
                     .build()
     );

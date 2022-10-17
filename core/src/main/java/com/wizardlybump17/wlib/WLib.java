@@ -1,8 +1,10 @@
 package com.wizardlybump17.wlib;
 
-import com.wizardlybump17.wlib.adapter.ItemAdapter;
 import com.wizardlybump17.wlib.command.args.ArgsReaderRegistry;
-import com.wizardlybump17.wlib.command.reader.*;
+import com.wizardlybump17.wlib.command.reader.EntityTypeArgsReader;
+import com.wizardlybump17.wlib.command.reader.MaterialReader;
+import com.wizardlybump17.wlib.command.reader.OfflinePlayerReader;
+import com.wizardlybump17.wlib.command.reader.PlayerReader;
 import com.wizardlybump17.wlib.database.DatabaseRegister;
 import com.wizardlybump17.wlib.database.model.MySQLDatabaseModel;
 import com.wizardlybump17.wlib.database.model.SQLiteDatabaseModel;
@@ -51,7 +53,6 @@ public class WLib extends JavaPlugin {
         ArgsReaderRegistry.INSTANCE.add(new OfflinePlayerReader());
         ArgsReaderRegistry.INSTANCE.add(new EntityTypeArgsReader());
         ArgsReaderRegistry.INSTANCE.add(new MaterialReader());
-        ArgsReaderRegistry.INSTANCE.add(new BlockDataArgsReader());
     }
 
     private void initSerializables() {
@@ -76,25 +77,9 @@ public class WLib extends JavaPlugin {
 
     private String selectItemAdapter() {
         String version = Bukkit.getServer().getClass().getName().split("\\.")[3];
-        return switch (version) {
-            case "v1_17_R1" -> {
-                ItemAdapter.setInstance(new com.wizardlybump17.wlib.adapter.v1_17_R1.ItemAdapter());
-                yield "v1_17_R1";
-            }
-            case "v1_18_R1" -> {
-                ItemAdapter.setInstance(new com.wizardlybump17.wlib.adapter.v1_18_R1.ItemAdapter());
-                yield "v1_18_R1";
-            }
-            case "v1_18_R2" -> {
-                ItemAdapter.setInstance(new com.wizardlybump17.wlib.adapter.v1_18_R2.ItemAdapter());
-                yield "v1_18_R2";
-            }
-            case "v1_19_R1" -> {
-                ItemAdapter.setInstance(new com.wizardlybump17.wlib.adapter.v1_19_R1.ItemAdapter());
-                yield "v1_19_R1";
-            }
-            default -> null;
-        };
+        switch (version) {
+            default: return null;
+        }
     }
 
     public static WLib getInstance() {
