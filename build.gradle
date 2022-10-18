@@ -6,7 +6,7 @@ plugins {
 apply plugin: 'maven-publish'
 
 allprojects {
-    group = 'com.wizardlybump17.wlib'
+    group = 'com.wizardlybump17.wlib.legacy'
     version = '1.5.0'
 
     apply plugin: 'com.github.johnrengelman.shadow'

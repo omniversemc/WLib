@@ -12,6 +12,7 @@ dependencies {
 
     implementation(
             project(':versions:adapter'),
+            project(':versions:v1_8_R3'),
 
             project(':database'),
             project(':objects'),

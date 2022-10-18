@@ -255,7 +255,7 @@ public class ItemFilter implements ConfigurationSerializable {
 
     @Override
     public @NotNull Map<String, Object> serialize() {
-        return Map.of("filters", filters.stream().map(map -> MapUtils.mapKeys(map, Enum::name)).toList());
+        return MapUtils.mapOf("filters", filters.stream().map(map -> MapUtils.mapKeys(map, Enum::name)).collect(Collectors.toCollection(ArrayList::new)));
     }
 
     @SuppressWarnings("unchecked")

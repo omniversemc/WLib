@@ -1,5 +1,6 @@
 package com.wizardlybump17.wlib.util.bukkit;
 
+import com.wizardlybump17.wlib.util.MapUtils;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.SerializableAs;
 import org.jetbrains.annotations.NotNull;
@@ -17,7 +18,7 @@ public class NumberFormatter extends com.wizardlybump17.wlib.util.NumberFormatte
     @NotNull
     @Override
     public Map<String, Object> serialize() {
-        return Map.of("suffixes", getSuffixes());
+        return MapUtils.mapOf("suffixes", getSuffixes());
     }
 
     @SuppressWarnings("unchecked")

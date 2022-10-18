@@ -29,4 +29,11 @@ public class StringUtil {
             sb.append(s1.substring(0, 1).toUpperCase()).append(s1.substring(1).toLowerCase()).append(" ");
         return sb.toString().trim();
     }
+
+    public static String repeat(String string, int times) {
+        StringBuilder builder = new StringBuilder(string.length() * times);
+        for (int i = 0; i < times; i++)
+            builder.append(string);
+        return builder.toString();
+    }
 }

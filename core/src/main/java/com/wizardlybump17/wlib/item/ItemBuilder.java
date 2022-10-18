@@ -278,8 +278,8 @@ public class ItemBuilder implements ConfigurationSerializable, Cloneable {
             result.put("item-flags", itemFlags().stream().map(Enum::name).collect(Collectors.toCollection(ArrayList::new)));
         if (!enchantments().isEmpty())
             result.put("enchantments", MapUtils.mapKeys(enchantments(), Enchantment::getName));
-//        if (!nbtTags().isEmpty())
-//            result.put("nbt-tags", ItemAdapter.getInstance().serializeContainer(container()));
+        if (!nbtTags().isEmpty())
+            result.put("nbt-tags", ItemAdapter.getInstance().nbtToJava(nbtTags()));
         if (unbreakable())
             result.put("unbreakable", true);
         if (skullUrl() != null)
@@ -330,6 +330,10 @@ public class ItemBuilder implements ConfigurationSerializable, Cloneable {
             result.itemFlags(((List<String>) map.get("item-flags")).stream().map(ItemFlag::valueOf).collect(Collectors.toSet()));
         if (map.get("enchantments") != null)
             ((Map<String, Number>) map.get("enchantments")).forEach((key, value) -> result.enchantment(Enchantment.getByName(key), value.intValue()));
+        if (map.get("glow") != null)
+            result.glow((boolean) map.get("glow"));
+        if (map.get("unbreakable") != null)
+            result.unbreakable((boolean) map.get("unbreakable"));
 
         if (map.get("skull") != null) {
             String skull = map.get("skull").toString();
@@ -339,8 +343,6 @@ public class ItemBuilder implements ConfigurationSerializable, Cloneable {
                 result.skull(skull);
             }
         }
-
-        result.unbreakable((boolean) map.getOrDefault("unbreakable", false));
 
         if (result.applyColor()) {
             result

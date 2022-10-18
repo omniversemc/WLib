@@ -1,5 +1,6 @@
 package com.wizardlybump17.wlib.database;
 
+import com.wizardlybump17.wlib.util.StringUtil;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -218,7 +219,7 @@ public abstract class Database<M extends DatabaseModel<?>> {
         builder.delete(builder.length() - 2, builder.length());
 
         builder.append(") VALUES (");
-        builder.append("?, ".repeat(data.size()));
+        builder.append(StringUtil.repeat("?, ", data.size()));
         builder.delete(builder.length() - 2, builder.length());
 
         builder.append(");");

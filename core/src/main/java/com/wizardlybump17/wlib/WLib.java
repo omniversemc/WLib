@@ -1,5 +1,6 @@
 package com.wizardlybump17.wlib;
 
+import com.wizardlybump17.wlib.adapter.ItemAdapter;
 import com.wizardlybump17.wlib.command.args.ArgsReaderRegistry;
 import com.wizardlybump17.wlib.command.reader.EntityTypeArgsReader;
 import com.wizardlybump17.wlib.command.reader.MaterialReader;
@@ -78,6 +79,10 @@ public class WLib extends JavaPlugin {
     private String selectItemAdapter() {
         String version = Bukkit.getServer().getClass().getName().split("\\.")[3];
         switch (version) {
+            case "v1_8_R3": {
+                ItemAdapter.setInstance(new com.wizardlybump17.wlib.adapter.v1_8_R3.ItemAdapter());
+                return "v1_8_R3";
+            }
             default: return null;
         }
     }

@@ -13,7 +13,8 @@ import java.util.*;
 
 public class ItemAdapter extends com.wizardlybump17.wlib.adapter.ItemAdapter {
 
-    public static final Set<String> IGNORED_TAGS = ReflectionUtil.getField(ReflectionUtil.getClass("org.bukkit.craftbukkit.v1_8_R3.inventory.CraftMetaItem"), null, "HANDLED_TAGS");
+    public static final Class<?> CRAFT_META_ITEM_CLASS = ReflectionUtil.getClass("org.bukkit.craftbukkit.v1_8_R3.inventory.CraftMetaItem");
+    public static final Set<String> IGNORED_TAGS = ReflectionUtil.getField(CRAFT_META_ITEM_CLASS, null, "HANDLED_TAGS");
 
     @Override
     public void setSkull(@NonNull SkullMeta meta, @NonNull String url) {
@@ -33,7 +34,10 @@ public class ItemAdapter extends com.wizardlybump17.wlib.adapter.ItemAdapter {
 
     @Override
     public void setNbtTags(@NonNull ItemMeta meta, @NonNull Map<String, Object> nbtTags) {
-        ReflectionUtil.setField(meta.getClass(), meta, "unhandledTags", javaToNbt(nbtTags));
+        Map<String, Object> tags = new HashMap<>(nbtTags.size());
+        for (Map.Entry<String, Object> entry : nbtTags.entrySet())
+            tags.put(entry.getKey(), javaToNbt(entry.getValue()));
+        ReflectionUtil.setField(getItemMetaClass(meta.getClass()), meta, "unhandledTags", tags);
     }
 
     @Override
@@ -46,11 +50,37 @@ public class ItemAdapter extends com.wizardlybump17.wlib.adapter.ItemAdapter {
     @Override
     @SuppressWarnings("unchecked")
     public @NotNull Map<String, Object> getNbtTags(@NonNull ItemMeta meta) {
-        return (Map<String, Object>) nbtToJava(ReflectionUtil.getField(meta.getClass(), meta, "unhandledTags"));
+        Map<String, Object> tags = (Map<String, Object>) nbtToJava(ReflectionUtil.getField(getItemMetaClass(meta.getClass()), meta, "unhandledTags"));
+        for (String tag : IGNORED_TAGS)
+            tags.remove(tag);
+        return tags;
     }
 
+    private Class<?> getItemMetaClass(Class<?> clazz) {
+        if (clazz == CRAFT_META_ITEM_CLASS)
+            return clazz;
+
+        return getItemMetaClass(clazz.getSuperclass());
+    }
+
+    @SuppressWarnings("unchecked")
     @Override
     public Object nbtToJava(Object original) {
+        if (original instanceof Map) {
+            Map<Object, Object> map = (Map<Object, Object>) original;
+            Map<String, Object> output = new HashMap<>(map.size());
+            for (Map.Entry<Object, Object> entry : map.entrySet())
+                output.put(entry.getKey().toString(), nbtToJava(entry.getValue()));
+            return output;
+        }
+        if (original instanceof List) {
+            List<Object> list = (List<Object>) original;
+            List<Object> output = new ArrayList<>(list.size());
+            for (Object object : list)
+                output.add(nbtToJava(object));
+            return output;
+        }
+
         if (!(original instanceof NBTBase))
             return original;
 
