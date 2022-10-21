@@ -2,6 +2,8 @@ package com.wizardlybump17.wlib.util.bukkit;
 
 import lombok.experimental.UtilityClass;
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.util.Vector;
 
 import java.util.List;
 import java.util.ListIterator;
@@ -28,5 +30,19 @@ public class StringUtil {
         while (iterator.hasNext())
             iterator.set(colorize(iterator.next()));
         return strings;
+    }
+
+    public static String toString(Object object) {
+        if (object instanceof Vector) {
+            Vector vector = (Vector) object;
+            return "X: " + vector.getX() + ", Y: " + vector.getY() + ", Z: " + vector.getZ();
+        }
+
+        if (object instanceof Location) {
+            Location location = (Location) object;
+            return "X: " + location.getX() + ", Y: " + location.getY() + ", Z: " + location.getZ() + ", World: " + location.getWorld().getName();
+        }
+
+        return object.toString();
     }
 }
