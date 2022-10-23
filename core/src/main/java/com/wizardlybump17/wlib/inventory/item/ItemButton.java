@@ -12,6 +12,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -105,7 +106,10 @@ public class ItemButton implements ConfigurationSerializable, Cloneable {
     @SuppressWarnings("unchecked")
     public static ItemButton deserialize(Map<String, Object> map) {
         ItemBuilder itemBuilder = (ItemBuilder) map.get("item");
-        Map<Object, Object> customData = (Map<Object, Object>) map.get("custom-data");
-        return new ItemButton(itemBuilder, null, customData);
+        return new ItemButton(
+                itemBuilder,
+                null,
+                (Map<Object, Object>) map.getOrDefault("custom-data", Collections.emptyMap())
+        );
     }
 }

@@ -58,7 +58,7 @@ public class ItemBuilder implements ConfigurationSerializable, Cloneable {
 
     private <T> T getFromMeta(Function<ItemMeta, T> supplier, T def) {
         ItemMeta meta = item.getItemMeta();
-        if (meta == null)
+        if (!item.hasItemMeta() || meta == null)
             return def;
 
         T t = supplier.apply(meta);
@@ -248,7 +248,10 @@ public class ItemBuilder implements ConfigurationSerializable, Cloneable {
 
     @NotNull
     public Map<String, Object> nbtTags() {
-        return ItemAdapter.getInstance().getNbtTags(getItemMeta());
+        if (item.hasItemMeta())
+            return ItemAdapter.getInstance().getNbtTags(getItemMeta());
+
+        return new HashMap<>();
     }
 
     public ItemStack build() {
@@ -276,8 +279,13 @@ public class ItemBuilder implements ConfigurationSerializable, Cloneable {
             result.put("lore", lore());
         if (!itemFlags().isEmpty())
             result.put("item-flags", itemFlags().stream().map(Enum::name).collect(Collectors.toCollection(ArrayList::new)));
-        if (!enchantments().isEmpty())
-            result.put("enchantments", MapUtils.mapKeys(enchantments(), Enchantment::getName));
+        if (!enchantments().isEmpty()) {
+            Map<Enchantment, Integer> enchantments = new HashMap<>(enchantments());
+            enchantments.remove(GlowEnchantment.INSTANCE);
+            result.put("enchantments", MapUtils.mapKeys(enchantments, Enchantment::getName));
+        }
+        if (glow())
+            result.put("glow", true);
         if (!nbtTags().isEmpty())
             result.put("nbt-tags", ItemAdapter.getInstance().nbtToJava(nbtTags()));
         if (unbreakable())

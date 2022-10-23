@@ -223,6 +223,16 @@ public class ItemUtil {
         }
 
         return i;
+    }
 
+    public static int getEnoughSpace(Inventory inventory, ItemStack item) {
+        int space = 0;
+        for (ItemStack i : inventory) {
+            if (i == null)
+                space += item.getMaxStackSize();
+            else if (i.isSimilar(item))
+                space += i.getMaxStackSize() - i.getAmount();
+        }
+        return space;
     }
 }
