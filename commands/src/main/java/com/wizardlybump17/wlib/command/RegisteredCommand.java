@@ -120,11 +120,6 @@ public class RegisteredCommand implements Comparable<RegisteredCommand> {
     }
 
     private void checkArrays(String input, List<String> target) throws ArgsReaderException {
-        if (input.indexOf('"') == -1) {
-            target.addAll(Arrays.asList(input.split(" ")));
-            return;
-        }
-
         StringBuilder builder = new StringBuilder();
         boolean inArray = false;
         for (String s : input.split(" ")) {
@@ -147,7 +142,7 @@ public class RegisteredCommand implements Comparable<RegisteredCommand> {
                 continue;
             }
 
-            if (builder.length() > 0) { //string | it is in the array
+            if (!builder.isEmpty()) { //string | it is in the array
                 builder.append(s.replace("\\\"", "\"")).append(" ");
                 continue;
             }
