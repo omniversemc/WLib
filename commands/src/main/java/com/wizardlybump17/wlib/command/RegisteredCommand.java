@@ -142,7 +142,7 @@ public class RegisteredCommand implements Comparable<RegisteredCommand> {
                 continue;
             }
 
-            if (!builder.isEmpty()) { //string | it is in the array
+            if (builder.length() != 0) { //string | it is in the array
                 builder.append(s.replace("\\\"", "\"")).append(" ");
                 continue;
             }
