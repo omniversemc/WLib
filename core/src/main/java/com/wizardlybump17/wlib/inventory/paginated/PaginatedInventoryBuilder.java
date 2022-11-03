@@ -116,6 +116,10 @@ public class PaginatedInventoryBuilder implements ConfigurationSerializable, Clo
         return this;
     }
 
+    public List<ItemButton> content() {
+        return content;
+    }
+
     private void checkNullContent() {
         for (ItemButton button : content)
             if (button == null)
