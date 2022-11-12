@@ -17,6 +17,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 @Getter
 @RequiredArgsConstructor
+@Setter
 public class PaginatedInventory {
 
     private final int id = ThreadLocalRandom.current().nextInt();
@@ -24,10 +25,10 @@ public class PaginatedInventory {
     private int currentPage;
     private HumanEntity player;
     private final List<InventoryListener<?>> listeners;
-    @Setter
     private boolean unregisterListeners = true;
     private boolean listenersRegistered;
     private final Map<Object, Object> data;
+    private boolean navigating;
 
     public void show(@NotNull HumanEntity player, int page) {
         if (page < 0 || page >= inventories.size())
@@ -54,15 +55,19 @@ public class PaginatedInventory {
     }
 
     public void showNextPage(@NotNull HumanEntity player) {
-        unregisterListeners = false;
-        show(player, currentPage + 1);
-        unregisterListeners = true;
+        showPage(player, 1);
     }
 
     public void showPreviousPage(@NotNull HumanEntity player) {
+        showPage(player, -1);
+    }
+
+    private void showPage(@NotNull HumanEntity player, int page) {
+        navigating = true;
         unregisterListeners = false;
-        show(player, currentPage - 1);
+        show(player, currentPage + page);
         unregisterListeners = true;
+        navigating = false;
     }
 
     public CustomInventory getCurrentInventory() {

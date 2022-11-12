@@ -216,7 +216,11 @@ public class PaginatedInventoryBuilder implements ConfigurationSerializable, Clo
             return;
         }
 
-        inventory.addButton(slot, new ItemButton(previousPage.getItem(), (event, inventory1) -> inventory.getPaginatedHolder().showPreviousPage(event.getWhoClicked())));
+        inventory.addButton(slot, new ItemButton(previousPage.getItem(), (event, eventInventory) -> {
+            eventInventory.setNavigating(true);
+            inventory.getPaginatedHolder().showPreviousPage(event.getWhoClicked());
+            eventInventory.setNavigating(false);
+        }));
     }
 
     private void setNextPage(int slot, CustomInventory inventory, int page, int maxPages) {
@@ -233,7 +237,12 @@ public class PaginatedInventoryBuilder implements ConfigurationSerializable, Clo
                 inventory.addButton(slot, nextPage.getReplacementButton());
             return;
         }
-        inventory.addButton(slot, new ItemButton(nextPage.getItem(), (event, inventory1) -> inventory.getPaginatedHolder().showNextPage(event.getWhoClicked())));
+
+        inventory.addButton(slot, new ItemButton(nextPage.getItem(), (event, eventInventory) -> {
+            eventInventory.setNavigating(true);
+            inventory.getPaginatedHolder().showNextPage(event.getWhoClicked());
+            eventInventory.setNavigating(false);
+        }));
     }
 
     private int getPages() {
